@@ -562,7 +562,7 @@ contract MyStrategy is BaseStrategy, ReentrancyGuardUpgradeable {
         emit TreeDistribution(address(CVXCRV_VAULT), cvxCRVAfterBalance.sub(cvxCRVInitialBalance), block.number, block.timestamp);
 
         /// @dev Harvest event that every strategy MUST have, see BaseStrategy
-        emit Harvest(earnedReward, block.number);
+        emit Harvest(0, block.number);
 
         /// @dev Harvest must return the amount of want increased
         return earnedReward;
