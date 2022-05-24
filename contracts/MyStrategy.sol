@@ -565,7 +565,7 @@ contract MyStrategy is BaseStrategy, ReentrancyGuardUpgradeable {
         emit Harvest(0, block.number);
 
         /// @dev Harvest must return the amount of want increased
-        return earnedReward;
+        return 0;
     }
 
     /// @dev Rebalance, Compound or Pay off debt here
