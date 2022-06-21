@@ -601,7 +601,7 @@ contract MyStrategy is BaseStrategy, ReentrancyGuardUpgradeable {
 
     /// @dev process all locks, to redeem
     /// @notice No Access Control Checks, anyone can unlock an expired lock
-    function manualProcessExpiredLocks() public whenNotPaused {
+    function manualProcessExpiredLocks() public {
         // Unlock veCVX that is expired and redeem CVX back to this strat
         LOCKER.processExpiredLocks(false);
     }
