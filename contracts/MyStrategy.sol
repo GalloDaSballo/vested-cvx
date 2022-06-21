@@ -184,20 +184,25 @@ contract MyStrategy is BaseStrategy, ReentrancyGuardUpgradeable {
     /// @notice Only not protected, moves the whole amount using _handleRewardTransfer
     /// @notice because token paths are harcoded, this function is safe to be called by anyone
     /// @notice Will not notify the BRIBES_PROCESSOR as this could be triggered outside bribes
-    function sweepRewardToken(address token) public nonReentrant {
+    function sweepRewardToken(address token) external nonReentrant {
         _onlyGovernanceOrStrategist();
+
+        _sweepRewardToken(token);
+    }
+
+    /// @dev Bulk function for sweepRewardToken
+    function sweepRewards(address[] calldata tokens) external nonReentrant {
+        uint256 length = tokens.length;
+        for(uint i = 0; i < length; i++){
+            _sweepRewardToken(tokens[i]);
+        }
+    }
+
+    function _sweepRewardToken(address token) internal {
         _onlyNotProtectedTokens(token);
 
         uint256 toSend = IERC20Upgradeable(token).balanceOf(address(this));
         _handleRewardTransfer(token, toSend);
-    }
-
-    /// @dev Bulk function for sweepRewardToken
-    function sweepRewards(address[] calldata tokens) external {
-        uint256 length = tokens.length;
-        for(uint i = 0; i < length; i++){
-            sweepRewardToken(tokens[i]);
-        }
     }
 
     /// @dev Skim away want to bring back ppfs to 1e18
