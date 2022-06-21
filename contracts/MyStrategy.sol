@@ -410,17 +410,17 @@ contract MyStrategy is BaseStrategy, ReentrancyGuardUpgradeable {
 
     /// @dev Get the current Vault.balance
     /// @notice this is reflexive, a change in the strat will change the balance in the vault
-    function _getBalance() internal returns (uint256) {
+    function _getBalance() internal view returns (uint256) {
         ISettV4 vault = ISettV4(IController(controller).vaults(want));
         return vault.balance();
     }
     /// @dev Get the current Vault.totalSupply
-    function _getTotalSupply() internal returns (uint256) {
+    function _getTotalSupply() internal view returns (uint256) {
         ISettV4 vault = ISettV4(IController(controller).vaults(want));
         return vault.totalSupply();
     }
 
-    function _getPricePerFullShare() internal returns (uint256) {
+    function _getPricePerFullShare() internal view returns (uint256) {
         ISettV4 vault = ISettV4(IController(controller).vaults(want));
         return vault.getPricePerFullShare();
     }
