@@ -32,6 +32,7 @@ import {BaseStrategy} from "../deps/BaseStrategy.sol";
  * V1.6 New Locker, work towards fully permissioneless claiming // Protected Launch
  * V1.7 Integration with onChain BribesProcessor
  * V1.7.1 Updated BribesProcessor
+ * V1.7.2 Fixed grief with reward being stuck
  */
 contract MyStrategy is BaseStrategy, ReentrancyGuardUpgradeable {
     using SafeERC20Upgradeable for IERC20Upgradeable;
@@ -432,7 +433,7 @@ contract MyStrategy is BaseStrategy, ReentrancyGuardUpgradeable {
 
     /// @dev Specify the version of the Strategy, for upgrades
     function version() external pure returns (string memory) {
-        return "1.7";
+        return "1.7.2";
     }
 
     /// @dev Balance of want currently held in strategy positions
@@ -533,14 +534,11 @@ contract MyStrategy is BaseStrategy, ReentrancyGuardUpgradeable {
     function harvest() public whenNotPaused returns (uint256) {
         _onlyAuthorizedActors();
 
-        uint256 _beforeReward = IERC20Upgradeable(reward).balanceOf(address(this));
-
         // Get cvxCRV
         LOCKER.getReward(address(this), false);
 
         // Rewards Math
-        uint256 earnedReward =
-            IERC20Upgradeable(reward).balanceOf(address(this)).sub(_beforeReward);
+        uint256 earnedReward = IERC20Upgradeable(reward).balanceOf(address(this));
 
         uint256 cvxCrvToGovernance = earnedReward.mul(performanceFeeGovernance).div(MAX_FEE);
         if(cvxCrvToGovernance > 0){
