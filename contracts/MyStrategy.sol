@@ -193,7 +193,7 @@ contract MyStrategy is BaseStrategy, ReentrancyGuardUpgradeable {
     /// @dev Bulk function for sweepRewardToken
     function sweepRewards(address[] calldata tokens) external nonReentrant {
         uint256 length = tokens.length;
-        for(uint i = 0; i < length; i++){
+        for(uint i = 0; i < length; ++i){
             _sweepRewardToken(tokens[i]);
         }
     }
@@ -260,7 +260,7 @@ contract MyStrategy is BaseStrategy, ReentrancyGuardUpgradeable {
         // Also checks balance diff
         uint256 length = tokens.length;
         uint256[] memory beforeBalance = new uint256[](length);
-        for(uint i = 0; i < length; i++){
+        for(uint i = 0; i < length; ++i){
             beforeBalance[i] = IERC20Upgradeable(tokens[i]).balanceOf(address(this));
         }
 
@@ -272,7 +272,7 @@ contract MyStrategy is BaseStrategy, ReentrancyGuardUpgradeable {
         // Ultimately it's proof of non-zero which is good enough
 
         // Send reward to Multisig
-        for(uint x = 0; x < length; x++){
+        for(uint x = 0; x < length; ++x){
             address token = tokens[x];
             uint256 difference = IERC20Upgradeable(token).balanceOf(address(this)).sub(beforeBalance[x]);
 
@@ -336,15 +336,17 @@ contract MyStrategy is BaseStrategy, ReentrancyGuardUpgradeable {
         uint256 beforeVaultBalance = _getBalance();
         uint256 beforePricePerFullShare = _getPricePerFullShare();
 
-        require(tokens.length == indexes.length && tokens.length == amounts.length && tokens.length == merkleProofs.length, "Length Mismatch");
+        uint256 length = tokens.length;
+
+        require(length == indexes.length && length == amounts.length && length == merkleProofs.length, "Length Mismatch");
         // tokens.length = length, can't declare var as stack too deep
-        uint256[] memory beforeBalance = new uint256[](tokens.length);
-        for(uint i = 0; i < tokens.length; i++){
+        uint256[] memory beforeBalance = new uint256[](length);
+        for(uint i = 0; i < length; ++i){
             beforeBalance[i] = IERC20Upgradeable(tokens[i]).balanceOf(address(this));
         }
 
-        IVotiumBribes.claimParam[] memory request = new IVotiumBribes.claimParam[](tokens.length);
-        for(uint x = 0; x < tokens.length; x++){
+        IVotiumBribes.claimParam[] memory request = new IVotiumBribes.claimParam[](length);
+        for(uint x = 0; x < length; ++x){
             request[x] = IVotiumBribes.claimParam({
                 token: tokens[x],
                 index: indexes[x],
@@ -358,7 +360,7 @@ contract MyStrategy is BaseStrategy, ReentrancyGuardUpgradeable {
         bool nonZeroDiff; // Cached value but also to check if we need to notifyProcessor
         // Ultimately it's proof of non-zero which is good enough
 
-        for(uint i = 0; i < tokens.length; i++){
+        for(uint i = 0; i < length; ++i){
             address token = tokens[i]; // Caching it allows it to compile else we hit stack too deep
             uint256 difference = IERC20Upgradeable(token).balanceOf(address(this)).sub(beforeBalance[i]);
             if(difference > 0){
@@ -471,7 +473,8 @@ contract MyStrategy is BaseStrategy, ReentrancyGuardUpgradeable {
     function _onlyNotProtectedTokens(address _asset) internal override {
         address[] memory protectedTokens = getProtectedTokens();
 
-        for (uint256 x = 0; x < protectedTokens.length; x++) {
+        uint256 length = protectedTokens.length;
+        for (uint256 x = 0; x < length; ++x) {
             require(
                 address(protectedTokens[x]) != _asset,
                 "Asset is protected"
